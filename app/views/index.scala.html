@@ -1,0 +1,22 @@
+@(message: String)
+
+@main("Beats Choice") {
+    <div class="page-header">
+        <h1>BeatsChoice<small> </small></h1>
+    </div>
+
+    <form action="/room">
+        <div class="form-group">
+            <label for="exampleInputEmail1">Name</label>
+            <input Name="roomName" class="form-control" id="roomName" placeholder="Enter room name">
+        </div>
+
+        <input type="submit" class="btn btn-primary btn-large" value="create" Name="room" label="Create Room">
+        <input type="submit" class="btn btn-primary btn-large" value="join" Name="room" label="Join Room">
+    </form>
+
+    <form>
+    </form>
+
+
+}

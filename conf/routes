@@ -1,0 +1,15 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET        /                    controllers.Application.index
+GET        /room                controllers.Application.room(roomName:String,room:String)
+GET        /vote                controllers.Application.vote(id:String,roomName:String)
+GET        /songCheck           controllers.Application.songCheck(roomName:String, cTrack:String)
+GET        /songComplete        controllers.Application.songDone(roomName:String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET        /assets/*file        controllers.Assets.at(path="/public", file)
+
+    

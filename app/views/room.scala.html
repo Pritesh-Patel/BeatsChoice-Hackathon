@@ -1,0 +1,135 @@
+@(room: Room,isAdmin : Boolean)
+
+@main("Room") {
+    <script>
+    $(document).on("pagecreate","#pageone",function(){
+    var roomName= $('#roomName').text();
+    console.log("roomName is" + roomName);
+    var currentTrack = $('#currentTrack' ).text();
+    console.log("currentTrack is" + currentTrack);
+
+    $('.collapse').collapse('hide')
+    $('div[name=swipeable]').on("swipeleft",function(){
+    console.log("lft");
+    $(this).hide();
+    });
+
+    $('div[name=swipeable]').on("swiperight",function() {
+    $ ( this ).hide ( ) ;
+
+    console.log ( "right" )
+    //make ajax request
+    $.ajax ( {
+    url : "/vote",
+    data : { 'id' : this.id, 'roomName' : roomName }
+
+    } ) ;
+    });
+
+    $('#meta').addClass("center");
+    $('#audio').addClass("center");
+    $('#art').addClass("center");
+    $("[name='nameT']").addClass("center");
+
+
+
+    });
+
+
+    </script>
+
+    <style>
+    .center {
+    display:block;
+    margin-left: auto;
+    margin-right:auto;
+    padding: 16px
+    }
+    </style>
+
+    <div data-role="page" id="pageone">
+        <div class="page-header">
+            <h1>BeatsChoice <small>@room.roomName</small></h1>
+        </div>
+
+        <h4 id="meta">Now playing: @room.currentTrack.title , @room.currentTrack.artist</h4>
+        @if(isAdmin){
+            <audio id="audio" autoplay controls src=@routes.Assets.at(room.currentTrack.mp3URL) type="audio/mp3"></audio>
+            <script>
+            $( document ).ready(function() {
+            var roomName = $ ( '#roomName' ).text ( ) ;
+
+            console.log( "ready!" );
+
+            document.getElementById('audio').addEventListener("ended",function() {
+            console.log("songEnded1");
+            window.location.href = '/songComplete?roomName='+roomName.toString();
+
+            console.log("songEnded2");
+            });
+
+            });
+            </script>
+
+        }else{
+            <script>
+            $( document ).ready(function() {
+            var currentTrack = $('#currentTrack' ).text();
+
+            var roomName = $ ( '#roomName' ).text ( ) ;
+            setInterval ( function ( ) {
+            $.ajax ( { url : "songCheck", success : function ( d ) {
+
+            console.log ( "polled..below is response + SENT " + currentTrack ) ;
+            console.log ( d ) ;
+            if ( d === "reload" ) {
+            location.reload ( ) ;
+            } ;
+            }, data : { 'roomName' : roomName, 'cTrack' : currentTrack } } ) ;
+            }, 2000 );
+
+            });
+
+            </script>
+        }
+
+        <img src=@routes.Assets.at(room.currentTrack.albumArtURL) class="img-rounded" id="art" alt="Album art" width="300" height="300">
+
+        <div data-role="main" class="ui-content">
+        @for( x <- room.votingTracks ){
+            <div class="panel panel-primary"  name="swipeable" id=@x.id>
+                <div class="panel-heading">@x.title</div>
+                <div class="panel-body">
+                @x.artist
+                </div>
+            </div>
+        }
+        </div>
+
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="display:block; margin-left:  auto; margin-right:auto; padding: 16px">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h3 class="panel-title" >
+                        <a  data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Show QR Code
+                        </a>
+                    </h3>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne" >
+                    <div class="panel-body">
+                        <div id="qrcode"></div>
+                        <script type="text/javascript">
+                        var url = window.location.href;
+                        new QRCode(document.getElementById("qrcode"), window.location.href.replace("create","join") );
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <p id="roomName" style="visibility: hidden">@room.roomName</p>
+    <p id="currentTrack" >@room.currentTrack.title</p>
+
+}
